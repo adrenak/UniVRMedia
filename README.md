@@ -28,3 +28,7 @@ Uni360Video automates the manual workflow. It essentially follows these steps:
 - Only supported on Unity 5.6+ This repository was made on 5.6.1, so to run on 5.6.0 you may have to delete the Library and ProjectSettings folder
 - Currently only supports 360 panoramic videos
 - Sample video used : [Visit the Philippines](https://www.youtube.com/watch?v=vQt2NRT5yP4)
+
+# Contact
+[vatsalAmbastha@Twitter](https://www.twitter.com/vatsalAmbastha)  
+[adrenak@Github](https://www.github.com/adrenak)
