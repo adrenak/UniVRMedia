@@ -1,20 +1,16 @@
-﻿/*
- * Based on ReverseNormals.cs from Joachim Ante here : http://wiki.unity3d.com/index.php/ReverseNormals
- */
+﻿using UnityEngine;
 
-using UnityEngine;
-
-[RequireComponent(typeof(MeshFilter))]
-public class MeshFilterHelper {
-    public static void InvertNormals(MeshFilter filter) {
-        if (filter != null) {
-            Mesh mesh = filter.mesh;
-
+namespace UniVRMedia {
+    public static class Extensions {
+        // Based on ReverseNormals.cs from Joachim Ante here : http://wiki.unity3d.com/index.php/ReverseNormals
+        public static void InvertNormals(this Mesh mesh) {
+            // Calculate normals
             Vector3[] normals = mesh.normals;
             for (int i = 0; i < normals.Length; i++)
                 normals[i] = -normals[i];
             mesh.normals = normals;
 
+            // Create triangles
             for (int m = 0; m < mesh.subMeshCount; m++) {
                 int[] triangles = mesh.GetTriangles(m);
                 for (int i = 0; i < triangles.Length; i += 3) {
