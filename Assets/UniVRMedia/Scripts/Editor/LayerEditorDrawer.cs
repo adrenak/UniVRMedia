@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace UniVRMedia {
+namespace Adrenak.UniVRMedia {
     [CustomPropertyDrawer(typeof(LayerAttribute))]
     class LayerAttributeDrawer : PropertyDrawer {
 

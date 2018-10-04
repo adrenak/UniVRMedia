@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
-namespace UniVRMedia {
+namespace Adrenak.UniVRMedia {
     public class CameraControls : MonoBehaviour {
         public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
         public RotationAxes axes = RotationAxes.MouseXAndY;
-        public float sensitivityX = -5;
+        public float sensitivityX = 5;
         public float sensitivityY = 5F;
 
         public float minimumX = -360F;

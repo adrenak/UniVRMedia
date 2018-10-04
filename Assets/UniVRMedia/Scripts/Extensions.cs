@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UniVRMedia {
+namespace Adrenak.UniVRMedia {
     public static class Extensions {
         // Based on ReverseNormals.cs from Joachim Ante here : http://wiki.unity3d.com/index.php/ReverseNormals
         public static void InvertNormals(this Mesh mesh) {

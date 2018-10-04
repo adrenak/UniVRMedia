@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UniVRMedia {
+namespace Adrenak.UniVRMedia {
     /// <summary>
     /// Attribute to select a single layer.
     /// </summary>

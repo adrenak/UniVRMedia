@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Video;
 using System.Collections.Generic;
 
-namespace UniVRMedia {
-
+namespace Adrenak.UniVRMedia {
     public class VRMediaPlayer {
-        [System.Serializable]
+        [Serializable]
         public class Configuration {
             /// <summary>
             /// The position of the sphere video player and the camera in world space
@@ -29,13 +29,33 @@ namespace UniVRMedia {
             public int playerLayer;
         }
 
-        VideoPlayer m_VideoPlayer;
-        AudioSource m_AudioSource;
-        GameObject m_HostObject;
-        GameObject m_CameraObject;
+		/// <summary>
+		/// The <see cref="VideoPlayer"/> component that is playing the video
+		/// </summary>
+        public VideoPlayer Video { get; private set; }
+
+		/// <summary>
+		/// The <see cref="AudioSource"/> component that is playing the audio
+		/// </summary>
+        public AudioSource Audio { get; private set; }
+
+		/// <summary>
+		/// The <see cref="GameObject"/> that is the parent of all the player setup
+		/// </summary>
+        public GameObject Host { get; private set; }
+
+		/// <summary>
+		/// The <see cref="Camera"/> that is used for rendering the video sphere
+		/// </summary>
+        public GameObject Cam { get; private set; }
+
+		/// <summary>
+		/// The <see cref="Configuration"/> object that is used to appl the settings
+		/// </summary>
+        public Configuration Config { get; private set; }
+
         Dictionary<Camera, bool> m_CameraStatus = new Dictionary<Camera, bool>();
         float m_TimeScaleMemento;
-        Configuration m_Config;
 
         // ================================================
         // PUBLIC METHODS
@@ -45,11 +65,11 @@ namespace UniVRMedia {
         /// </summary>
         /// <param name="config"></param>
         public VRMediaPlayer(Configuration config) {
-            m_Config = config;
+            Config = config;
             CreateHostObject();
             ManageComponents();
             InvertNormals();
-            SetColor(m_Config.bgColor);
+            SetColor(Config.bgColor);
             SetupCamera();
         }
 
@@ -59,16 +79,16 @@ namespace UniVRMedia {
         public void Play() {
             SaveCameras();
             StopCameras();
-            m_CameraObject.GetComponent<Camera>().enabled = true;
+            Cam.GetComponent<Camera>().enabled = true;
             m_TimeScaleMemento = Time.timeScale;
             Time.timeScale = 0;
-            m_VideoPlayer.Play();
+            Video.Play();
         }
         /// <summary>
         /// Use this instead of VideoPlayer.Pause
         /// </summary>
         public void Pause() {
-            m_VideoPlayer.Pause();
+            Video.Pause();
         }
 
         /// <summary>
@@ -76,58 +96,35 @@ namespace UniVRMedia {
         /// </summary>
         public void Stop() {
             ResetCameras();
-            m_CameraObject.GetComponent<Camera>().enabled = false;
+            Video.Stop();
+            MonoBehaviour.Destroy(Host);
             Time.timeScale = m_TimeScaleMemento;
-            m_VideoPlayer.Stop();
-        }
-
-        // ================================================
-        // PUBLIC PROPERTIES
-        // ================================================
-        public Configuration Config {
-            get { return m_Config; }
-        }
-
-        public VideoPlayer Video {
-            get { return m_VideoPlayer; }
-        }
-
-        public AudioSource Audio {
-            get { return m_AudioSource; }
-        }
-
-        public GameObject HostObject {
-            get { return m_HostObject; }
-        }
-
-        public GameObject CameraObject {
-            get { return m_CameraObject; }
         }
 
         // ================================================
         // PRIVATE METHODS
         // ================================================
         void CreateHostObject() {
-            m_HostObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            m_HostObject.layer = m_Config.playerLayer;
-            m_HostObject.name = "UniVRMedia";
-            m_HostObject.transform.localScale = new Vector3(-100F, 100F, 100F);
-            m_HostObject.transform.position = m_Config.position;
+            Host = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Host.layer = Config.playerLayer;
+            Host.name = "UniVRMediaObject";
+            Host.transform.localScale = new Vector3(-100F, 100F, 100F);
+            Host.transform.position = Config.position;
         }
 
         void ManageComponents() {
-            var collider = m_HostObject.GetComponent<Collider>();
-            if (collider != null) MonoBehaviour.Destroy(collider);
+            var collider = Host.GetComponent<Collider>();
+            if (collider != null) UnityEngine.Object.Destroy(collider);
 
-            m_VideoPlayer = m_HostObject.AddComponent<VideoPlayer>();
-            m_AudioSource = m_HostObject.AddComponent<AudioSource>();
+            Video = Host.AddComponent<VideoPlayer>();
+            Audio = Host.AddComponent<AudioSource>();
 
-            m_VideoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
-            m_VideoPlayer.SetTargetAudioSource(0, m_AudioSource);
+            Video.audioOutputMode = VideoAudioOutputMode.AudioSource;
+            Video.SetTargetAudioSource(0, Audio);
         }
 
         void InvertNormals() {
-            var filter = m_HostObject.GetComponent<MeshFilter>();
+            var filter = Host.GetComponent<MeshFilter>();
             filter.mesh.InvertNormals();
         }
 
@@ -136,21 +133,23 @@ namespace UniVRMedia {
             tex.SetPixel(0, 0, color);
             tex.Apply();
 
-            var renderer = m_HostObject.GetComponent<Renderer>();
+            var renderer = Host.GetComponent<Renderer>();
             renderer.material.shader = Shader.Find("Unlit/Texture");
             renderer.material.mainTexture = tex;
         }
 
         void SetupCamera() {
+            var cameraRoot = new GameObject("UniVRMediaCameraRoot");
+            cameraRoot.transform.position = Config.position;
             // Create a new camera at the center of the player
-            m_CameraObject = new GameObject("Camera");
-            m_CameraObject.AddComponent<CameraControls>();
-            m_CameraObject.transform.parent = m_HostObject.transform;
-            m_CameraObject.transform.localPosition = Vector3.zero;
+            Cam = new GameObject("UniVRMediaCamera");
+            Cam.AddComponent<CameraControls>();
+            Cam.transform.SetParent(cameraRoot.transform);
+            Cam.transform.localPosition = Vector3.zero;
 
             // Initialize the camera component. Ignore the layers and set the clipping planes
-            var cam = m_CameraObject.AddComponent<Camera>();
-            cam.cullingMask = m_Config.cameraCullilngMask;
+            var cam = Cam.AddComponent<Camera>();
+            cam.cullingMask = Config.cameraCullilngMask;
 
             cam.nearClipPlane = 1F;
             cam.farClipPlane = 1000F;

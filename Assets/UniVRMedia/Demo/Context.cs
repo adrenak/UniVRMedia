@@ -1,22 +1,22 @@
 ﻿using UnityEngine;
 using UnityEngine.Video;
-using UniVRMedia;
+using Adrenak.UniVRMedia;
 
 public class Context : MonoBehaviour {
     [SerializeField]
     VRMediaPlayer.Configuration options;
 
     public void Start () {
-        VRMediaPlayer media = new VRMediaPlayer(options);
+        VRMediaPlayer player = new VRMediaPlayer(options);
 
-        media.Video.source = VideoSource.Url;
-        media.Video.url = "http://www.vatsalambastha.com/downloads/sample-360-video.mp4";
-        media.Video.isLooping = true;
-        media.Video.loopPointReached += delegate (VideoPlayer source) {
-            if (!media.Video.isLooping)
-                media.Video.Stop();
+        player.Video.source = VideoSource.Url;
+        player.Video.url = "http://www.vatsalambastha.com/downloads/sample-360-video.mp4";
+        player.Video.isLooping = true;
+        player.Video.loopPointReached += delegate (VideoPlayer source) {
+            if (!player.Video.isLooping)
+                player.Video.Stop();
         };
 
-        media.Play();
+        player.Play();
     }
 }
