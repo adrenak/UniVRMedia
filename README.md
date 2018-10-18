@@ -1,4 +1,4 @@
-# Uni360Video
+# UniVRMedia
 Stream 360 videos in Unity using its VideoPlayer component entirely through code and not editor setup.  
   
 # Purpose
